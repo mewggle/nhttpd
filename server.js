@@ -68,6 +68,7 @@ var server = http.createServer(function(req, res) {
     cfg = vhost[host],
     isProxy = false,
     pathname = u.pathname;
+  console.log('Serving %s', req.url);
   if (host.indexOf(":") > -1) {
     host = host.substring(0, host.indexOf(":"));
     cfg = vhost[host];
@@ -86,9 +87,10 @@ var server = http.createServer(function(req, res) {
     }
   }
   if (!isProxy) {
-    cfg.staticServer.serve(req, res, function(e, res) {
+    cfg.staticServer.serve(req, res, function(e) {
       if (e && (e.status === 404)) { // If the file wasn't found
-        cfg.staticServer.serveFile('/index.html', 200, {}, request, response);
+        req.url = "/";
+        cfg.staticServer.serve(req, res);
       }
     });
   }
