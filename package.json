@@ -11,13 +11,15 @@
     "type": "git",
     "url": "git://github.com/mewggle/nhttpd.git"
   },
-  "author": "Leonard Lin",
+  "author": "Leonard Lin <gwokae@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mewggle/nhttpd/issues"
   },
   "dependencies": {
-    "optimist": "0.6.0"
+    "optimist": "0.6.1",
+    "node-static": "0.7.3",
+    "http-proxy": "1.1.2"
   },
   "engines": {
     "node": ">=0.10"
