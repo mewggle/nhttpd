@@ -20,7 +20,11 @@ Sample of vhost/*.json
   "isDefault": true,
   "proxy": {
     "/apis": "https://api.my.com/actual-endpoint",
-    "/image": "https://my.image.com/folder"
+    "/image": "https://remote-url.com/folder",
+    "/serv-local-files": {
+      "type": "static",
+      "path": "/path-to-file/"
+    }
   }
 }
 ```

@@ -54,10 +54,25 @@ if (fs.lstatSync(argv.vhost).isDirectory()) {
 }
 // init
 for (var x in vhost) {
+  console.log('Initialize profile for hostname `%s`\n', x);
   vhost[x].staticServer = new statics.Server(vhost[x].path);
-  if (config.defaultHost === undefined || vhost[x].isDefault === true) {
+  if (config.defaultHost === undefined || (vhost[x].isDefault === true && vhost["*"] === undefined) || x === "*") {
     config.defaultHost = x;
   }
+  for (var y in vhost[x].proxy) {
+    var o = vhost[x].proxy[y];
+    if (typeof o === 'object') {
+      if (o.type === 'static') {
+        o.staticServer = new statics.Server(o.path);
+        console.log('Installed static file route `%s` (%s)', y, o.path);
+      } else {
+        console.error('Cannot identified proxy.type: `%s` for route `%s`', o.type, y);
+      }
+    } else if (typeof o === "string") {
+      console.log('Installed http/https proxy route `%s` (%s)', y, o);
+    }
+  }
+  console.log('-----------------------------------\n');
 }
 
 var proxy = httpProxy.createProxyServer({});
@@ -68,21 +83,31 @@ var server = http.createServer(function(req, res) {
     cfg = vhost[host],
     isProxy = false,
     pathname = u.pathname;
-  console.log('Serving %s', req.url);
   if (host.indexOf(":") > -1) {
     host = host.substring(0, host.indexOf(":"));
     cfg = vhost[host];
   }
   if (cfg === undefined) {
-    console.error('Cannot found vhost: %s, use default host: %s', host, config.defaultHost);
+    // console.error('Cannot found vhost: %s, use default host: %s', host, config.defaultHost);
     cfg = vhost[config.defaultHost]
   }
+  console.log('Serving `%s` via profile `%s`', req.url, cfg.host);
   for (var p in cfg.proxy) {
     if (pathname.indexOf(p) === 0) {
       isProxy = true;
-      proxy.web(req, res, {
-        target: cfg.proxy[p]
-      });
+      var proxySettings = cfg.proxy[p];
+      if (typeof proxySettings === 'string') {
+        proxy.web(req, res, {
+          target: proxySettings
+        });
+      } else if (typeof proxySettings === "object") {
+        if (proxySettings.type === 'static') {
+          req.url = req.url.substring(p.length);
+          proxySettings.staticServer.serve(req, res, function(e) {
+            if (e) console.log(e);
+          });
+        }
+      }
       break;
     }
   }
