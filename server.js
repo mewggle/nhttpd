@@ -1,4 +1,8 @@
-var opt = opt = require('optimist')
+var opt = require('optimist')
+  .options('h', {
+    alias: 'help',
+    describe: 'show help'
+  })
   .options('v', {
     alias: 'vhost',
     describe: 'path to vhost settings',
@@ -9,6 +13,11 @@ var opt = opt = require('optimist')
     describe: 'server port',
     default: 3000
   });
+
+if (opt.argv.help) {
+  opt.showHelp();
+  process.exit(0);
+}
 
 var http = require('http'),
   https = require('https'),
