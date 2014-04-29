@@ -10,6 +10,7 @@ Features
 =====
 
   * Serve multiple virtual host (vhost)
+  * pushState friendly (when serving static file encountered 404, it will serv `/`)
   * Sub-directory
   * http(s) proxy
 
@@ -51,7 +52,12 @@ Sample of vhost profile `vhost/*.json`
   "host": "abc.my.com",
   "path": "/home/to-file-path",
   "isDefault": true,
-  "options": {...}
+  "options": {
+    "headers": {
+      "Cache-Control": "no-cache",
+      "Custom-header": "my-header"
+    }
+  },
   "proxy": {
     "/apis": "https://api.my.com/actual-endpoint",
     "/image": "https://remote-url.com/folder",

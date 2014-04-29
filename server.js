@@ -64,7 +64,7 @@ if (fs.lstatSync(argv.vhost).isDirectory()) {
 // init
 for (var x in vhost) {
   console.log('Initialize profile for hostname `%s`\n', x);
-  vhost[x].staticServer = new statics.Server(vhost[x].path);
+  vhost[x].staticServer = new statics.Server(vhost[x].path, vhost[x].options || {});
   if (config.defaultHost === undefined || (vhost[x].isDefault === true && vhost["*"] === undefined) || x === "*") {
     config.defaultHost = x;
   }
@@ -72,7 +72,7 @@ for (var x in vhost) {
     var o = vhost[x].proxy[y];
     if (typeof o === 'object') {
       if (o.type === 'static') {
-        o.staticServer = new statics.Server(o.path);
+        o.staticServer = new statics.Server(o.path, o.options || {});
         console.log('Installed static file route `%s` (%s)', y, o.path);
       } else {
         console.error('Cannot identified proxy.type: `%s` for route `%s`', o.type, y);
