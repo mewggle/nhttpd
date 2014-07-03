@@ -132,9 +132,15 @@ var server = http.createServer(function(req, res) {
 });
 
 proxy.on('error', function(err, req, res) {
+  var msg = 'Unknown',
+    status = 500;
   if (err) {
-    console.log(err);
+    msg = '[Proxy Error]' + err.toString();
+    console.log(msg);
   }
+  res.statusCode = status;
+  res.write(msg);
+  res.end();
 });
 
 console.log('Server running: http://localhost:' + config.port);
